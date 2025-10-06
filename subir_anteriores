@@ -1,0 +1,248 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+import csv
+import sys
+
+# Configuración para evitar errores de Unicode en Windows
+sys.stdout.reconfigure(encoding='utf-8')
+
+# Configuración del navegador
+options = webdriver.ChromeOptions()
+options.add_argument('--disable-dev-shm-usage')
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+def leer_csv(nombre_archivo):
+    """Lee el archivo CSV y devuelve una lista de diccionarios con las respuestas"""
+    respuestas = []
+    with open(nombre_archivo, mode='r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            respuestas.append(row)
+    return respuestas
+
+def mapear_respuestas(respuesta_csv):
+    """Mapea las respuestas del CSV al formato esperado por el formulario"""
+    return {
+        "edad": respuesta_csv["¿Cuál es su edad? "].strip(" años").strip(),
+        "frecuencia": respuesta_csv["¿Con qué frecuencia consume barras energéticas? "],
+        "motivacion": respuesta_csv["¿Qué lo motiva a consumir barras energéticas?"].split(";"),
+        "tipos_barra": respuesta_csv["¿Qué tipos de barra conoce?"],
+        "importancia_natural": respuesta_csv["¿Qué tan importante es para usted que una barra energética sea natural? "],
+        "conoce_yacon": respuesta_csv["¿Conoce el yacón?"],
+        "como_endulzante": "Sí, prefiero yacón" if respuesta_csv["¿Preferiría una barra energética endulzada con yacón en lugar de azúcar refinada o edulcorantes artificiales?"] == "Si" else "No, prefiero azúcar",
+        "valora": respuesta_csv["¿Qué valora más al elegir una barra energética?  (Puede marcar más de una opción) "].split(";"),
+        "beneficios": respuesta_csv["¿Cuáles son los beneficios que espera obtener al consumir una barra energética?   (Puede marcar más de una opción) "].split(";"),
+        "presentacion": respuesta_csv["¿Qué presentación prefiere para consumir una barra energética? "],
+        "lugares_venta": respuesta_csv["¿Le gustaría encontrar este tipo de barra en…? (Puede marcar más de una opción) "].split(";"),
+        "precio": respuesta_csv[" ¿Cuánto estaría dispuesto a pagar por una barra energética elaborada con ingredientes naturales y endulzada con yacón?  "]
+    }
+
+def seleccionar_checkboxes(driver, opciones):
+    """Versión 2025 para Google Forms - Basada en la estructura actual"""
+    for opcion in opciones:
+        opcion = opcion.strip()
+        if not opcion:
+            continue
+
+        print(f"\nIntentando seleccionar: '{opcion}'")
+        encontrado = False
+        
+        # Estrategias específicas para la estructura 2025
+        estrategias = [
+            # 1. Por data-answer-value exacto (el más confiable)
+            {
+                "xpath": f"//div[@role='checkbox' and @data-answer-value='{opcion}']",
+                "desc": "data-answer-value exacto"
+            },
+            # 2. Por aria-label
+            {
+                "xpath": f"//div[@role='checkbox' and @aria-label='{opcion}']",
+                "desc": "aria-label exacto"
+            },
+            # 3. Por estructura completa con clases
+            {
+                "xpath": f"//div[contains(@class, 'uVccjd') and @data-answer-value='{opcion}']",
+                "desc": "estructura con clases"
+            },
+            # 4. Búsqueda por texto en elementos padres
+            {
+                "xpath": f"//label[.//div[@data-answer-value='{opcion}']]",
+                "desc": "a través de label padre"
+            }
+        ]
+
+        for estrategia in estrategias:
+            try:
+                # Esperar y encontrar el elemento
+                checkbox = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located((By.XPATH, estrategia["xpath"]))
+                )
+                
+                # Scroll preciso al elemento
+                driver.execute_script("""
+                    arguments[0].scrollIntoView({
+                        behavior: 'auto',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                """, checkbox)
+                
+                # Esperar a que sea interactuable
+                checkbox = WebDriverWait(driver, 3).until(
+                    EC.element_to_be_clickable((By.XPATH, estrategia["xpath"]))
+                )
+                
+                # Verificar estado actual
+                estado = checkbox.get_attribute("aria-checked")
+                if estado == "false" or estado is None:
+                    try:
+                        # Click con ActionChains para mayor precisión
+                        ActionChains(driver).move_to_element(checkbox).pause(0.3).click().perform()
+                        
+                        # Verificación post-click
+                        if checkbox.get_attribute("aria-checked") == "true":
+                            print(f"✅ [{estrategia['desc']}] Seleccionado: '{opcion}'")
+                            encontrado = True
+                            break
+                        else:
+                            # Segundo intento con JavaScript
+                            driver.execute_script("arguments[0].click();", checkbox)
+                            print(f"🔄 [JS Click] Intentando nuevamente: '{opcion}'")
+                    except Exception as e:
+                        print(f"⚠️ Error al hacer click: {str(e)}")
+                        driver.execute_script("arguments[0].click();", checkbox)
+                else:
+                    print(f"🔷 Opción ya estaba seleccionada: '{opcion}'")
+                    encontrado = True
+                    break
+                    
+            except Exception as e:
+                continue
+
+        if not encontrado:
+            print(f"❌ No se encontró con selectores directos: '{opcion}'")
+            print("Probando búsqueda por texto cercano...")
+            
+            try:
+                # Buscar elementos cercanos al texto
+                xpath_texto = f"//*[contains(text(), '{opcion}')]/ancestor::div[@role='checkbox']"
+                checkbox = WebDriverWait(driver, 2).until(
+                    EC.presence_of_element_located((By.XPATH, xpath_texto))
+                )
+                checkbox.click()
+                print(f"✅ [Texto cercano] Seleccionado: '{opcion}'")
+                encontrado = True
+            except:
+                print(f"🔥 No se pudo seleccionar: '{opcion}'")
+                # Tomar captura para diagnóstico
+                driver.save_screenshot(f"error_{opcion[:20].replace(' ', '_')}.png")
+    
+def seleccionar_radio_especifico(driver, texto_pregunta, opcion):
+    """Selecciona un radio button específico anclado a una pregunta"""
+    try:
+        # Estrategia 1: Buscar por data-value exacto dentro del grupo de la pregunta
+        xpath = f"//div[contains(text(), '{texto_pregunta}')]/ancestor::div[@role='radiogroup']//div[@data-value='{opcion}']"
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
+    except:
+        try:
+            # Estrategia 2: Buscar por texto visible dentro del grupo
+            xpath = f"//div[contains(text(), '{texto_pregunta}')]/ancestor::div[@role='radiogroup']//span[text()='{opcion}']/ancestor::div[@role='radio']"
+            WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
+        except:
+            # Estrategia 3: JavaScript como último recurso
+            xpath = f"//div[contains(text(), '{texto_pregunta}')]/ancestor::div[@role='radiogroup']//div[@data-value='{opcion}']"
+            elemento = driver.find_element(By.XPATH, xpath)
+            driver.execute_script("arguments[0].click();", elemento)
+
+def enviar_respuesta(respuesta):
+    try:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSeyd8ZNytFTpuFy_3wBNOvshP5fX2qbFgOuXFZg0j3O-w4J1g/viewform")
+
+        # Esperar a que cargue el formulario
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@role='list']")))
+
+        # 1. Edad
+        edad = respuesta["edad"]
+        edad_field = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@type='text' or @type='number']"))
+        )
+        edad_field.clear()
+        edad_field.send_keys(edad)
+
+        # 2. Frecuencia de consumo (radio button)
+        frecuencia = respuesta["frecuencia"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{frecuencia}')]").click()
+
+
+        # 3. Motivación (MÚLTIPLES CHECKBOXES - TODAS LAS OPCIONES)
+        print(f"Seleccionando motivaciones: {respuesta['motivacion']}")
+        seleccionar_checkboxes(driver, respuesta["motivacion"])
+
+        # 4. Tipos de barra conocidos (radio button)
+        tipo_barra = respuesta["tipos_barra"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{tipo_barra}')]").click()
+
+        # 5. Importancia de ingredientes naturales (radio button)
+        importancia = respuesta["importancia_natural"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{importancia}')]").click()
+
+        # 6. Conoce el yacón? (radio button)
+        conoce_yacon = respuesta["conoce_yacon"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{conoce_yacon}')]").click()
+
+        # 7. Preferiría yacón en lugar de azúcar? (radio button)
+        como_endulzante = respuesta["como_endulzante"]
+        print(f"Seleccionando opción de endulzante: {como_endulzante}")
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{como_endulzante}')]").click()
+
+
+        # 8. Qué valora más (MÚLTIPLES CHECKBOXES - TODAS LAS OPCIONES)
+        print(f"Seleccionando valores: {respuesta['valora']}")
+        seleccionar_checkboxes(driver, respuesta["valora"])
+
+        # 9. Beneficios esperados (MÚLTIPLES CHECKBOXES - TODAS LAS OPCIONES)
+        print(f"Seleccionando beneficios: {respuesta['beneficios']}")
+        seleccionar_checkboxes(driver, respuesta["beneficios"])
+
+        # 10. Presentación preferida (radio button)
+        presentacion = respuesta["presentacion"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{presentacion}')]").click()
+
+        # 11. Lugares de venta preferidos (MÚLTIPLES CHECKBOXES - TODAS LAS OPCIONES)
+        print(f"Seleccionando lugares de venta: {respuesta['lugares_venta']}")
+        seleccionar_checkboxes(driver, respuesta["lugares_venta"])
+
+        # 12. Precio dispuesto a pagar (radio button)
+        precio = respuesta["precio"]
+        driver.find_element(By.XPATH, f"//div[contains(@data-value, '{precio}')]").click()
+
+        # Enviar formulario
+        submit = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[text()='Enviar']"))
+        )
+        submit.click()
+
+        print(f"Respuesta enviada - Edad: {edad}, Frecuencia: {frecuencia}")
+        time.sleep(2)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+    finally:
+        driver.quit()
+
+# Proceso principal
+respuestas_csv = leer_csv("respuestas.csv")
+
+for respuesta in respuestas_csv:
+    respuesta_mapeada = mapear_respuestas(respuesta)
+    enviar_respuesta(respuesta_mapeada)
+    time.sleep(3)  # Pausa entre envíos
+
+print("🎉 Proceso completado! Todas las respuestas han sido enviadas.")
