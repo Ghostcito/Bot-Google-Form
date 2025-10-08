@@ -189,7 +189,10 @@ def enviar_respuesta():
 
         # Responder a cada pregunta
         for question, options in QUESTIONS:
-            choice = random.choice(options)
+            if question == QUESTIONS[0][0]:  # Primera pregunta: siempre "Si"
+                choice = "Sí"
+            else:
+                choice = random.choice(options)
             print(f"Intentando seleccionar para '{question}': {choice}")
             try:
                 seleccionar_radio(driver, choice)
