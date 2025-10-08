@@ -1,119 +1,19 @@
-¿En qué etapa de tu vida profesional te encuentras actualmente?
-☐ Estudiante universitario o técnico
-☐ Egresado sin experiencia laboral
-☐ Profesional con menos de 3 años de experiencia
-☐ Profesional con más de 3 años de experiencia
+¿Haz usado alguna vez algún servicio de preparación para entrevistas?
+☐ Si
+☐ No
 
-¿Con qué frecuencia participas en entrevistas laborales?
-☐ Varias veces al año
-☐ Una o dos veces al año
-☐ Casi nunca
-☐ Nunca he tenido una entrevista
+¿Le gustaría practicar entrevistas laborales con una plataforma que utilice inteligencia artificial?
+☐ Sí, definitivamente
+☐ Tal vez, según sus características
+☐ No me interesa
 
-¿Qué parte de una entrevista de trabajo te resulta más difícil?
-☐ Responder preguntas personales o de fortalezas
-☐ Mantener la calma o controlar los nervios
-☐ Expresar mis ideas con claridad
-☐ No sé qué esperan los reclutadores
+¿Qué tan atractiva considera la idea de una plataforma web con inteligencia artificial para practicar entrevistas laborales y recibir retroalimentación personalizada?
+☐ Muy atractiva
+☐ Bastante interesante
+☐ Moderadamente atractiva
+☐ Poco o nada atractiva
 
-¿Qué tan preparado(a) te sientes al asistir a una entrevista laboral?
-☐ Muy preparado(a)
-☐ Medianamente preparado(a)
-☐ Poco preparado(a)
-☐ Nada preparado(a)
-
-¿De qué forma te preparas normalmente antes de una entrevista?
-☐ Leo consejos en internet o redes sociales
-☐ Practico frente al espejo o con un amigo
-☐ Tomo cursos o talleres de empleabilidad
-☐ No suelo prepararme
-
-¿Qué opinas sobre usar inteligencia artificial para practicar entrevistas?
-☐ Me parece una herramienta innovadora y útil
-☐ Podría probarla si los resultados son buenos
-☐ No estoy seguro de confiar en la IA
-☐ Prefiero métodos tradicionales
-
-¿Qué tipo de ayuda te gustaría recibir de una app como InterviewPro?
-☐ Consejos personalizados según mis respuestas
-☐ Simulaciones de entrevistas reales
-☐ Evaluación de mi forma de hablar o expresarme
-☐ Recomendaciones para mejorar mi CV y perfil profesional
-
-¿Qué tan importante es para ti practicar antes de una entrevista real?
-☐ Muy importante
-☐ Algo importante
-☐ Poco importante
-☐ No lo considero necesario
-
-¿Qué beneficios esperas obtener al usar InterviewPro?
-☐ Mejorar mi seguridad y confianza
-☐ Evitar errores comunes
-☐ Conocer preguntas frecuentes
-☐ Recibir retroalimentación profesional
-
-¿Qué formato te resultaría más cómodo para practicar entrevistas?
-☐ Preguntas escritas con retroalimentación
-☐ Entrevista simulada por video
-☐ Entrevista por voz (audio)
-☐ Combinación de varios formatos
-
-¿Qué tan dispuesto(a) estarías a recibir retroalimentación automática basada en tus respuestas?
-☐ Muy dispuesto(a)
-☐ Algo dispuesto(a)
-☐ Poco dispuesto(a)
-☐ No me gustaría
-
-¿Qué aspecto valoras más en una aplicación de preparación laboral?
-☐ Facilidad de uso
-☐ Contenido útil y realista
-☐ Retroalimentación personalizada
-☐ Diseño atractivo e intuitivo
-
-¿Qué tan probable sería que recomiendes InterviewPro si cumple tus expectativas?
-☐ Muy probable
-☐ Algo probable
-☐ Poco probable
-☐ Nada probable
-
-¿Con qué frecuencia estarías dispuesto(a) a usar una aplicación como InterviewPro para practicar entrevistas?
-☐ Todos los días
-☐ Varias veces por semana
-☐ Una vez por semana
-☐ Solo antes de una entrevista importante
-
-¿Cuánto considerarías un precio justo por acceder a todas las funciones de InterviewPro?
-☐ No pagaría (solo versión gratuita)
-☐ Hasta S/10 mensuales
-☐ Entre S/11 y S/20 mensuales
-☐ Más de S/20 mensuales
-
-¿Qué factor te motivaría más a pagar por InterviewPro?
-☐ Ver resultados reales en mi desempeño
-☐ Contenido exclusivo o avanzado
-☐ Certificados o reconocimientos
-☐ Asesorías personalizadas
-
-¿Dónde te gustaría enterarte de una app como InterviewPro?
-☐ En redes sociales (Instagram, TikTok, LinkedIn)
-☐ A través de mi universidad o centro de estudios
-☐ En páginas de empleo como Computrabajo o Bumeran
-☐ Por recomendación de otros usuarios
-
-¿Qué red social usas con mayor frecuencia para temas profesionales o educativos?
-☐ TikTok
-☐ Instagram
-☐ LinkedIn
-☐ YouTube
-
-¿Qué tan probable sería que participes en una versión gratuita de prueba de InterviewPro?
-☐ Muy probable
-☐ Algo probable
-☐ Poco probable
-☐ Nada probable
-
-¿Qué horario prefieres para practicar entrevistas con la app?
-☐ Mañanas (7 a.m. – 12 p.m.)
-☐ Tardes (12 p.m. – 6 p.m.)
-☐ Noches (6 p.m. – 11 p.m.)
-☐ Cualquier horario, si la app está disponible 24/7
+¿Estaría dispuesto/a a pagar una suscripción accesible por el servicio?
+☐ Sí, sin problema
+☐ Tal vez, según el valor percibido
+☐ No pagaría por este servicio
